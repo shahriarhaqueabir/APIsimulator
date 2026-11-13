@@ -1,0 +1,68 @@
+Developer Documentation
+Structure (sourced from llms.txt — the actual ground truth, not HTML scraping):
+
+12 guide pages + 5 changelog entries + 90+ reference endpoints
+Sidebar also reveals two pages not indexed in llms.txt: Authorization and Portfolio Performance (edge case worth knowing — the AI-readable index is incomplete)
+
+Access model: API is invite-only. Contact point is gtm@lemon.markets. Nothing in the docs is publicly usable without a partner key. This is B2B-only infrastructure.
+
+API Resource Groups (Reference endpoints — complete)
+From the full reference index, there are 12 domain groups:
+GroupWhat it coversAccounts: GeneralCreate, get, list accounts; authenticators; experience profiles; onboarding checksAccounts: ID+VIdentity verification initiation, submission, person identificationBatch OrdersLegacy CRUD — deprecated as of June 2024, migrated to /ordersBusinessesNew Dec 2024 — business entity management (beneficial owners, legal reps, document submission)SettlementsSettlement accounts, transactions, settlement itemsDocumentsLegal agreements, per-account document managementEvents / WebhooksWebhook CRUD, event log, signature-verified notificationsIncome DistributionsFund income/dividend distributionsInstrumentsInstrument lookup by ISIN, price queries, trading halt test ISINsTreasuryMandates, transfers, fees, financials; fee breakdown per customerFinancialsPositions, transactions, withdrawals, balance sweepsOrdersThe unified order model replacing batch orders; create/confirm/cancel/listPersonsNew Dec 2024 — person data management; person data update requests (Oct 2025)Securities AccountsSub-account managementTax ExemptionsFreistellungsauftrag management (German-specific)TradesExecuted trade recordsWorkflowsSavings plans / recurring investment automationSCAStrong Customer Authentication (PSD2) — referenced in docs, endpoints within order/workflow flows
+
+Key Technical Mechanics
+GDPR Dual-Header Audit Mechanism — every API call requires two custom headers:
+
+LMG-Data-Privacy-Access-Principal — who is accessing the data (e.g. backend-erika.mustermann%40example.com or nobody for non-personal calls)
+LMG-Data-Privacy-Access-Justification — why (e.g. open_account, onboarding.identity_verification)
+
+This creates an auditable access log for every personal data access, baked into every single API call. Not optional. This is the compliance layer partners must implement correctly or access fails.
+Idempotency — full IETF-draft-standard implementation on POST /orders. Key behaviours:
+
+Key max 100 chars, UUID recommended
+24-hour expiry window
+Same key + different payload → 422 immediately
+Failed validation requests don't consume the key
+Currently only on order creation; explicitly scoped to extend to other write ops
+
+Webhooks — signature-validated via HMAC-SHA256 with LMG-Signature header format t=<epoch>,v1=<hex>. Replay attack protection via timestamp check. Webhook listeners must return 200 within 10 seconds or risk retries. Events are notifications, not data sources — the pattern is: receive event → fetch current entity state from API → update mirror.
+Data Mirroring pattern (June 2026 doc) — full architectural guide published specifically for integration partners. Covers: event queue design, idempotency, DLQ, reconciliation, out-of-order handling. API is always the authoritative source of truth — this is stated explicitly and repeatedly. Integration partners are expected to build shadow-copy mirror systems.
+Workflows (Savings Plans) — creates recurring investment instructions (order.create_and_confirm action + schedule trigger). Currently only monthly cadence in production (daily available in sandbox). Workflows are immutable — change = cancel + recreate. Workflows are confirmed separately from orders they generate; at cut-off time the order is created, at execution time it settles. Cancel after cut-off = must cancel workflow AND the generated order separately.
+Account onboarding flow (full sequence in docs):
+
+Fetch agreements (GET /agreements) → present legal docs to user
+Collect user data
+Create account (POST /accounts) → returns account ID in created status
+Check onboarding blockers (GET /accounts/:id/checks) → typically experience and identity_verification both need action
+Start video identification (POST /accounts/:id/identity_verification) → get redirect URL to WebID
+Set experience profile (POST /accounts/:id/experience) → knowledge/experience survey
+Wait for account.created webhook event or poll /checks
+
+Business accounts (Dec 2024) — separate entity model. Requires beneficial owners, legal representatives, document submission. Separate endpoint group /businesses.
+Treasury module — mandates, transfers, financial reporting, and a fee breakdown system allowing partners to see per-customer contributions to aggregated treasury fees.
+Income Distributions — dividend/distribution tracking per instrument.
+
+Changelog (complete, all 5 entries)
+DateWhat changed2026-01-30Person data updates now support self-declared tax residency (full residencies list with country + TIN)2025-10-07New: Person data update endpoints (POST/GET /persons/:id/updates). Supports email, phone, address, employment updates. New event types: update.created, update.succeeded, update.failed. person_customer query param on GET accounts (deprecated going forward)2024-12-05Business accounts shipped: /businesses endpoint group, person management endpoints, expanded account API2024-06-04Batch orders deprecated → unified /orders. account.closed status added. Workflows updated for new orders API2024-05-22Account management split into General + ID+V sections. KYC-reliance endpoints added
+The 2025-01 API changes doc is a migration guide (not a changelog entry) covering: created_at deprecation on withdrawals, /batch_orders full deprecation, batch_order.* event types deprecated in favour of order.*, /instruments/:isin/quote replaced by /instruments/:isin/prices, latest_quote replaced by latest_price on positions, and check.pending event type deprecated.
+
+Privacy Policy
+Controller: lemon.markets brokerage GmbH, Prinzessinnenstraße 19-20, 10969 Berlin. Current version: 30.10.2025.
+Key data points:
+
+DPO exists, contactable at datenschutz@lemon.markets
+Log retention: 60 minutes then anonymised (extended only for active attacks/prosecution)
+Tools: Google Tag Manager (necessary, no consent needed), Google Analytics 4 (consent-gated, IP-anonymised, 2-month retention), Microsoft Advertising (consent-gated)
+Consent management via CookieFirst
+Data shared with: service providers under processor agreements, authorities under legal obligation, within contractual necessity
+Third-country transfers (US): covered via SCCs (Implementing Decision EU 2021/914, Module 3) plus explicit consent under Art. 49(1)(a)
+Applicant data retained 3 months post-rejection; 12 months if consent given for talent pool
+Supervisory authority: Berlin Commissioner for Data Protection and Freedom of Information, Alt-Moabit 59-61, 10555 Berlin
+
+
+Interview-Relevant Observations
+What a Solutions Engineer would actually touch: The onboarding flow, GDPR headers on every call, webhook implementation, idempotency on orders, and potentially the Treasury/Income Distribution reporting endpoints depending on partner type.
+Where integration pain lives: The GDPR dual-header requirement is non-trivial for partners to implement correctly — every call needs a meaningful principal + justification that creates a real audit trail. The Data Mirroring doc shows lemon.markets has invested significantly in telling partners how to build robust integration layers, which implies they've seen partners get it wrong.
+Product direction visible in changelog: The arc is clear — individual account → business accounts (Dec 2024) → self-service personal data updates (Oct 2025) → tax residency updates (Jan 2026). They're moving toward a more complete lifecycle management product, not just order placement.
+What's explicitly sandbox-only: Daily workflow cadence, test ISINs for trading halts and yield scenarios (specific XF00000000XX ISINs documented), WebID test flows.
+One gap: The sidebar has pages (Authorization, Portfolio Performance, Strong Customer Authentication) not indexed in llms.txt — meaning they were either added after the index was last generated or excluded intentionally. Worth knowing these exist if you're demoing the docs.

@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Space {
+  id        String   @id
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders    Order[]
+  events    Event[]
+  webhooks  Webhook[]
+  issues    Issue[]
+}
+
+model Order {
+  id         String   @id
+  spaceId    String
+  space      Space    @relation(fields: [spaceId], references: [id])
+  isin       String
+  side       String
+  quantity   String
+  limitPrice String?
+  status     String
+  createdAt  DateTime
+  updatedAt  DateTime @updatedAt
+
+  trades  Trade[]
+}
+
+model Trade {
+  id        String   @id
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+  isin      String
+  side      String
+  price     String
+  quantity  String
+  createdAt DateTime
+}
+
+model Document {
+  id           String   @id
+  spaceId      String
+  type         String
+  status       String
+  rejectReason String?
+  createdAt    DateTime
+  updatedAt    DateTime @updatedAt
+}
+
+model Event {
+  id        String   @id
+  spaceId   String
+  space     Space    @relation(fields: [spaceId], references: [id])
+  type      String
+  payload   String
+  createdAt DateTime
+}
+
+model Webhook {
+  id        String   @id
+  spaceId   String
+  space     Space    @relation(fields: [spaceId], references: [id])
+  eventType String
+  payload   String
+  status    String
+  createdAt DateTime
+}
+
+model Issue {
+  id          String    @id
+  spaceId     String
+  space       Space     @relation(fields: [spaceId], references: [id])
+  type        String
+  severity    String
+  description String
+  details     String?
+  status      String
+  resolvedAt  DateTime?
+  notes       String?
+  createdAt   DateTime
+  updatedAt   DateTime @updatedAt
+}

@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js build output
+.next/
+out/
+build/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Local databases / data
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+dev.db
+
+# Generated Prisma client
+src/generated/prisma/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+nul
+
+# Test artifacts
+coverage/
+playwright-report/
+test-results/
+
+# Playwright MCP
+.playwright-mcp/
+
+# Teaching playbook (shared separately, not committed)
+docs/playbook for provider-ops-console.md
+
+# Misc
+*.tsbuildinfo
+next-env.d.ts

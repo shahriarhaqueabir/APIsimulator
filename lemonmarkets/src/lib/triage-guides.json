@@ -1,0 +1,102 @@
+[
+  {
+    "issueType": "stuck_order",
+    "title": "Order Stuck in 'open'",
+    "description": "An order has been in 'open' status longer than expected and has not filled or failed.",
+    "severity": "medium",
+    "steps": [
+      {
+        "id": "check-market-hours",
+        "label": "Check if the market is currently open",
+        "description": "Verify that the relevant exchange is in trading hours. Many orders remain open simply because the market is closed.",
+        "hint": "Use the instruments endpoint to check trading hours for this ISIN."
+      },
+      {
+        "id": "check-isin-halt",
+        "label": "Check if the ISIN is halted",
+        "description": "Some instruments may have trading halts. Check the instrument status for halt indicators.",
+        "apiCheck": "/v1/instruments/{isin}",
+        "hint": "Test with sandbox ISINs: XF0000000046 (buy halt), XF0000000053 (sell halt), XF0000000061 (both halt)."
+      },
+      {
+        "id": "check-position-limits",
+        "label": "Verify position limits",
+        "description": "Check if the space has reached its position limits for this instrument.",
+        "hint": "Position limits are configured per space in the lemon.markets dashboard."
+      }
+    ]
+  },
+  {
+    "issueType": "trade_failed",
+    "title": "Trade Execution Failed",
+    "description": "A trade has failed to execute. This may be due to insufficient funds, invalid ISIN, or market conditions.",
+    "severity": "high",
+    "steps": [
+      {
+        "id": "check-order-details",
+        "label": "Review the failed order details",
+        "description": "Check the order's response payload for the failure reason code.",
+        "hint": "Common codes: insufficient_funds, invalid_isin, market_closed, limit_reached."
+      },
+      {
+        "id": "check-account-balance",
+        "label": "Verify the account has sufficient funds",
+        "description": "Check the space's cash balance to ensure enough funds are available for the trade.",
+        "apiCheck": "/v1/spaces/{space_id}"
+      },
+      {
+        "id": "validate-isin",
+        "label": "Validate the ISIN is tradeable",
+        "description": "Confirm the ISIN is a valid, tradeable instrument through the instruments endpoint.",
+        "apiCheck": "/v1/instruments/{isin}"
+      }
+    ]
+  },
+  {
+    "issueType": "onboarding_incomplete",
+    "title": "Client Onboarding Incomplete",
+    "description": "A client space has not completed the KYC/documentation process.",
+    "severity": "medium",
+    "steps": [
+      {
+        "id": "check-document-status",
+        "label": "Review which documents are pending",
+        "description": "Check the documents endpoint for this space to see which KYC documents are still pending or rejected.",
+        "apiCheck": "/v1/documents?space_id={space_id}",
+        "hint": "Common requirements: ID front/back, proof of address, tax declaration."
+      },
+      {
+        "id": "check-rejection-reasons",
+        "label": "Review rejection reasons",
+        "description": "If documents were rejected, check the rejection reason to guide the client on resubmission.",
+        "hint": "Common reasons: image_unreadable, document_expired, name_mismatch, address_mismatch."
+      },
+      {
+        "id": "guide-resubmission",
+        "label": "Guide the client on resubmission",
+        "description": "Provide clear guidance on what needs to be corrected and resubmitted.",
+        "hint": "Clients can re-upload documents through the onboarding flow."
+      }
+    ]
+  },
+  {
+    "issueType": "document_rejected",
+    "title": "KYC Document Rejected",
+    "description": "A client's KYC document has been rejected and needs attention.",
+    "severity": "high",
+    "steps": [
+      {
+        "id": "review-rejection",
+        "label": "Review the rejection reason",
+        "description": "Check the document's reject_reason field to understand why it was rejected.",
+        "apiCheck": "/v1/documents/{document_id}"
+      },
+      {
+        "id": "communicate-with-client",
+        "label": "Communicate with the client",
+        "description": "Inform the client about what needs to be corrected and how to resubmit.",
+        "hint": "Be specific about what's wrong. 'Image too dark' vs. 'Document expired' require different actions."
+      }
+    ]
+  }
+]
