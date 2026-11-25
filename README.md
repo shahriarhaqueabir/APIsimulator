@@ -20,11 +20,11 @@ APIsimulator makes the full API lifecycle visible in one place: Action → Reque
 
 ```mermaid
 flowchart LR
-  UI[Next.js console] --> API[App Router / API routes]
-  API --> Proxy[Server-side proxy]
-  Proxy --> Sim[APIsimulator provider sandbox]
-  API --> DB[(Prisma + SQLite/dev DB)]
-  API --> Events[Async event stream]
+  UI[🖥️ Next.js console] --> API[🌐 App Router / API routes]
+  API --> Proxy[🛡️ Server-side proxy]
+  Proxy --> Sim[📦 APIsimulator provider sandbox]
+  API --> DB[(🗄️ Prisma + SQLite/dev DB)]
+  API --> Events[📡 Async event stream]
   Events --> UI
 ```
 
