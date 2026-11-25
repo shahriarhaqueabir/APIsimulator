@@ -48,24 +48,19 @@ flowchart LR
 
 ## 📋 The playbook - recreate from zero
 
-### Phase 0 - Scope
-1. One sentence: _"Make the full API lifecycle visible in one place."_
+### Phase 0 - Scope 🎯1. One sentence: _"Make the full API lifecycle visible in one place."_
 2. Boundaries: demo-first, no browser-exposed secrets, fixed-point money.
 
-### Phase 1 - Skeleton
-3. Next.js 15 + React 19 + Tailwind 4.
+### Phase 1 - Skeleton 🦴3. Next.js 15 + React 19 + Tailwind 4.
 4. Prisma schema for core lifecycle models.
 
-### Phase 2 - Lifecycle console
-5. Model Action → Request → Response → DB State → Async Event.
+### Phase 2 - Lifecycle console 📊5. Model Action → Request → Response → DB State → Async Event.
 6. Zod validation at API boundaries.
 
-### Phase 3 - Safety & ops
-7. Server-side proxying; keys never reach browser.
+### Phase 3 - Safety & ops 🛡️7. Server-side proxying; keys never reach browser.
 8. Triage ladder/severity model for operator review.
 
-### Phase 4 - Ship
-9. 
+### Phase 4 - Ship 🚢9. 
 pm run build + lint; verify Demo Mode works with no credentials.
 
 
