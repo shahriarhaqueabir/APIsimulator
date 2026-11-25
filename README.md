@@ -141,6 +141,8 @@ APIsimulator/
 
 ## 📜 License
 
-MIT — see [LICENSE](LICENSE).
+Private project — no license.
 
-## 🔗 Links- Blog post: Provider Ops Console (coming soon)
+## 🔗 Links
+
+- Blog post: Provider Ops Console (coming soon)
