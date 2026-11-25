@@ -45,3 +45,12 @@ docs/playbook for provider-ops-console.md
 # Misc
 *.tsbuildinfo
 next-env.d.ts
+
+# Personal notes (private)
+.memory/
+
+# Private modules (secrets, adapters, config - never committed)
+private/
+private/secrets/
+private/adapters/
+private/config/
