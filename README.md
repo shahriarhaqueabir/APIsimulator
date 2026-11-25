@@ -30,10 +30,10 @@ flowchart LR
 
 | Component | Responsibility | Key location |
 |---|---|---|
-| Console UI | Action/request/response/state/event views | app/, components/ |
-| API routes | Server-side request handling & validation | app/api/, lib/ |
-| Prisma | Lifecycle/state persistence | prisma/ |
-| Demo mode | Runs without provider credentials | lib/, env/config |
+| 🖥️ Console UI | Action/request/response/state/event views | app/, components/ |
+| 🌐 API routes | Server-side request handling & validation | app/api/, lib/ |
+| 🗄️ Prisma | Lifecycle/state persistence | prisma/ |
+| 🎮 Demo mode | Runs without provider credentials | lib/, env/config |
 
 
 
