@@ -124,13 +124,23 @@ APIsimulator/
 - `npm run lint` — ESLint clean
 - Demo Mode works without any API credentials
 
-## 📌 Takeaways
+## ⚠️ Mistakes to avoid
 
+- **Trusting the docs over the live API.** Provider schemas drift. Dump the raw response and validate with Zod before trusting any field.
+- **Exposing API keys to the browser.** All provider calls go through the server-side proxy. The browser never sees a key.
+- **Storing money as floats.** Amounts are strings end-to-end. Floating point will silently corrupt balances.
+- **Skipping Demo Mode.** It exists so you can evaluate the console before you have credentials. Use it.
+- **Treating observability as a UI problem.** The data model comes first; the UI just renders it.
+
+## 📌 Takeaways
 - Demo mode with realistic seed data makes onboarding instant.
 - Server-side proxying is the only safe place for API keys.
 - Zod at the boundary turns "API drift" into a loud, early failure.
 - Observability is a data model problem before it is a UI problem.
 - Your system should look different from mine.
 
-## 🔗 Links
-- Blog post: Provider Ops Console (coming soon)
+## 📜 License
+
+MIT — see [LICENSE](LICENSE).
+
+## 🔗 Links- Blog post: Provider Ops Console (coming soon)
