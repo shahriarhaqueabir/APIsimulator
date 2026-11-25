@@ -16,6 +16,10 @@
 
 APIsimulator makes the full API lifecycle visible in one place: Action → Request → Response → DB State → Async Event. It runs in Demo Mode with no API key, so you can evaluate the console before you ever have credentials.
 
+## 📌 TL;DR
+
+When integrating with an external financial/trading/provisioning API, the hard part is seeing what happened afterward. Provider Ops Console makes the whole chain visible in one place: Action → API Request → Response → Database State → Async Event. It runs in Demo Mode with no API key, so you can evaluate the console before you ever have credentials.
+
 ## 🏗️ Architecture - how the pieces talk
 
 ```mermaid
@@ -48,20 +52,29 @@ flowchart LR
 
 ## 📋 The playbook - recreate from zero
 
-### Phase 0 - Scope 🎯1. One sentence: _"Make the full API lifecycle visible in one place."_
+### Phase 0 - Scope 🎯
+
+1. One sentence: _"Make the full API lifecycle visible in one place."_
 2. Boundaries: demo-first, no browser-exposed secrets, fixed-point money.
 
-### Phase 1 - Skeleton 🦴3. Next.js 15 + React 19 + Tailwind 4.
+### Phase 1 - Skeleton 🦴
+
+3. Next.js 15 + React 19 + Tailwind 4.
 4. Prisma schema for core lifecycle models.
 
-### Phase 2 - Lifecycle console 📊5. Model Action → Request → Response → DB State → Async Event.
+### Phase 2 - Lifecycle console 📊
+
+5. Model Action → Request → Response → DB State → Async Event.
 6. Zod validation at API boundaries.
 
-### Phase 3 - Safety & ops 🛡️7. Server-side proxying; keys never reach browser.
+### Phase 3 - Safety & ops 🛡️
+
+7. Server-side proxying; keys never reach browser.
 8. Triage ladder/severity model for operator review.
 
-### Phase 4 - Ship 🚢9. 
-pm run build + lint; verify Demo Mode works with no credentials.
+### Phase 4 - Ship 🚢
+
+9. npm run build + lint; verify Demo Mode works with no credentials.
 
 
 
@@ -111,6 +124,13 @@ APIsimulator/
 - `npm run lint` — ESLint clean
 - Demo Mode works without any API credentials
 
-## 🔗 Links
+## 📌 Takeaways
 
+- Demo mode with realistic seed data makes onboarding instant.
+- Server-side proxying is the only safe place for API keys.
+- Zod at the boundary turns "API drift" into a loud, early failure.
+- Observability is a data model problem before it is a UI problem.
+- Your system should look different from mine.
+
+## 🔗 Links
 - Blog post: Provider Ops Console (coming soon)
